@@ -80,7 +80,7 @@ set wildmode=list:longest
 "colorshceme settings
 "}}}
 
-"PLUGINS ---------------------------------------------------------------- {{{
+"PLUGINS ----------------------------------------------------------------{{{
 
 call plug#begin('~/.vim/plugged')
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
