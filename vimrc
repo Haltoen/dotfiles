@@ -1,13 +1,13 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""               
-"               
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
 "               ██╗   ██╗██╗███╗   ███╗██████╗  ██████╗
 "               ██║   ██║██║████╗ ████║██╔══██╗██╔════╝
-"               ██║   ██║██║██╔████╔██║██████╔╝██║     
-"               ╚██╗ ██╔╝██║██║╚██╔╝██║██╔══██╗██║     
+"               ██║   ██║██║██╔████╔██║██████╔╝██║
+"               ╚██╗ ██╔╝██║██║╚██╔╝██║██╔══██╗██║
 "                ╚████╔╝ ██║██║ ╚═╝ ██║██║  ██║╚██████╗
 "                 ╚═══╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝
-"               
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""               
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "{{{ Basic settings
 
 " Disable compatibility with vi which can cause unexpected issues.
@@ -90,29 +90,32 @@ Plug 'tpope/vim-fugitive'
 "Plug 'airblade/vim-gitgutter'
 Plug 'vim-airline/vim-airline'
 Plug 'tomasr/molokai'
-Plug 'dense-analysis/ale'
+"Plug 'dense-analysis/ale'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 call plug#end()
 
 "}}}
 
-"{{{ Language Support settings 
-" 
-
-" Only enable ALE for Python
-let g:ale_linters = {
-\   'python': ['flake8']
-\ }
-
-" Ignore flake8 style warnings (E and W codes)
-
-let g:ale_python_flake8_options = '--ignore=E,W'
-
-
+"{{{ Language Support settings
+"
 function! CocAutoInstall() abort
-  let extensions = ['coc-vimlsp', 'coc-pyright']
-  for ext in extensions
+   let extensions = [
+        \ 'coc-vimlsp',
+        \ 'coc-json',
+        \ 'coc-tsserver',
+        \ 'coc-pyright',
+        \ 'coc-go',
+        \ 'coc-rust-analyzer',
+        \ 'coc-java',
+        \ 'coc-clangd',
+        \ 'coc-sh',
+        \ 'coc-html',
+        \ 'coc-css',
+        \ 'coc-yaml',
+        \ 'coc-markdownlint'
+        \ ]
+   for ext in extensions
     if index(coc#util#installed_extensions(), ext) < 0
       call coc#util#install([ext])
     endif
@@ -121,11 +124,16 @@ endfunction
 
 " Only run when coc is ready
 autocmd User CocNvimInit call CocAutoInstall()
+
+" Format on save
+autocmd BufWritePre * %s/\s\+$//e
+autocmd BufWritePre * silent! :call CocAction('format')
+
 "}}}
 
-"{{{ Random stuff 
+"hello "{{{ Random stuff
 
-" set colorscheme 
+" set colorscheme
 set termguicolors
 colorscheme molokai
 
@@ -196,14 +204,6 @@ if version >= 703
     set undoreload=10000
 endif
 
-" You can split a window into sections by typing `:split` or `:vsplit`.
-" Display cursorline and cursorcolumn ONLY in active window.
-augroup cursor_off
-    autocmd!
-    autocmd WinLeave * set nocursorline nocursorcolumn
-    autocmd WinEnter * set cursorline cursorcolumn
-augroup END
-
 " }}}
 
 " STATUS LINE ------------------------------------------------------------ {{{
@@ -224,4 +224,5 @@ set statusline+=%=
 set laststatus=2
 
 " }}}
+
 
