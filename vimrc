@@ -87,7 +87,7 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
+"Plug 'airblade/vim-gitgutter'
 Plug 'vim-airline/vim-airline'
 Plug 'tomasr/molokai'
 Plug 'dense-analysis/ale'
