@@ -125,12 +125,40 @@ endfunction
 " Only run when coc is ready
 autocmd User CocNvimInit call CocAutoInstall()
 
-" Format on save
+" run to get Coc Extensions
+":CocInstall coc-vimlsp coc-json coc-tsserver coc-pyright coc-go coc-rust-analyzer coc-java coc-clangd coc-sh coc-html coc-css coc-yaml coc-markdownlint
+"Lint on save
 autocmd BufWritePre * %s/\s\+$//e
 autocmd BufWritePre * silent! :call CocAction('format')
 
+" LSP completion settings
+" Use tab for completion and navigation
+inoremap <silent><expr> <TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+" Trigger completion manually
+inoremap <silent><expr> <C-Space> coc#refresh()
+
+" Accept completion with Enter
+inoremap <silent><expr> <CR> pumvisible() ? coc#_select_confirm() : "\<CR>"
+
+" Show documentation with K
+nnoremap <silent> K :call ShowDocumentation()<CR>
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    execute '!' . &keywordprg . " " . expand('<cword>')
+  endif
+endfunction
+
+" Use coc's go-to-definition for gd and gD
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gD <Plug>(coc-declaration)
 "}}}
 
+" Prevent Fugitive from failing on non-git files
+autocmd BufWritePost * if fugitive#is_git() | call fugitive#DidChange() | endif
 "hello "{{{ Random stuff
 
 " set colorscheme
