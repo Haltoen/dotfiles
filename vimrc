@@ -87,20 +87,23 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-fugitive'
-"Plug 'airblade/vim-gitgutter'
 Plug 'vim-airline/vim-airline'
 Plug 'tomasr/molokai'
-"Plug 'dense-analysis/ale'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'tpope/vim-surround'
+Plug 'ryanoasis/vim-devicons'
 call plug#end()
 
+"Plug 'dense-analysis/ale'
+"Plug 'airblade/vim-gitgutter'
 "}}}
 
 "{{{ Language Support settings
 "
 function! CocAutoInstall() abort
    let extensions = [
+        \ 'coc-autopep8',
         \ 'coc-vimlsp',
         \ 'coc-json',
         \ 'coc-tsserver',
@@ -158,18 +161,29 @@ nmap <silent> gD <Plug>(coc-declaration)
 "}}}
 
 " Prevent Fugitive from failing on non-git files
-autocmd BufWritePost * if fugitive#is_git() | call fugitive#DidChange() | endif
-"hello "{{{ Random stuff
+" autocmd BufWritePost * if fugitive#is_git() | call fugitive#DidChange() | endif
+" Color settings {{{
 
 " set colorscheme
 set termguicolors
+set ttyfast
 colorscheme molokai
+" Soften cursorline highlight
+highlight CursorLine ctermbg=236 guibg=#2a2a2a
+" Soften search highlight
+highlight Search ctermbg=yellow ctermfg=yellow guibg=#444444 guifg=green
+" Dim matching parens
+highlight MatchParen ctermbg=NONE guibg=#3a3a3a guifg=#ffaf5f
+set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
+"set guicursor=n-v-c-i:block
+" }}}
 
+" Maps {{{
 " Type jj to exit insert mode quickly.
 inoremap jj <Esc>
 
-" Press the space bar to type the : character in command mode.
-nnoremap <space> :
+" set space bar to <leader> (for custom commands)
+nnoremap <space> <leader>
 
 " Pressing the letter o will open a new line below the current one.
 " Exit insert mode after creating a new line above or below the current line.
@@ -204,14 +218,33 @@ noremap <c-up> <c-w>+
 noremap <c-down> <c-w>-
 noremap <c-left> <c-w>>
 noremap <c-right> <c-w><
+"}}}
 
-" NERDTree specific mappings.
+" {{{ NERDTree specific mappings.
 " Map the F3 key to toggle NERDTree open and close.
 nnoremap <F3> :NERDTreeToggle<cr>
 
 " Have nerdtree ignore certain files and directories.
 let NERDTreeIgnore=['\.git$', '\.jpg$', '\.mp4$', '\.ogg$', '\.iso$', '\.pdf$', '\.pyc$', '\.odt$', '\.png$', '\.gif$', '\.db$']
+let g:NERDTreeWinPos = "right"
+"needed for icons using vim-DevIcons
+set encoding=UTF-8
+"}}}
 
+" Auto-resize NERDTree to fit longest filename (with a minimum width)
+function! NERDTreeAutoSize()
+  if &filetype ==# 'nerdtree'
+    " Recalculate width based on longest line in the buffer
+    let l:maxlen = max(map(getline(1, '$'), 'strwidth(v:val)'))
+    " Add some padding, clamp to a minimum of 20 and max of 50
+    let l:width = min([max([20, l:maxlen + 2]), 50])
+    execute 'vertical resize ' . l:width
+  endif
+endfunction
+
+" Run auto-size after opening or refreshing NERDTree
+autocmd BufWinEnter,WinEnter * call NERDTreeAutoSize()
+autocmd CursorHold * if &filetype ==# 'nerdtree' | call NERDTreeAutoSize() | endif
 
 "oVIMSCRIPT -------------------------------------------------------------- {{{
 
@@ -252,5 +285,8 @@ set statusline+=%=
 set laststatus=2
 
 " }}}
+
+
+
 
 
