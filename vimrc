@@ -84,21 +84,24 @@ set wildmode=list:longest
 
 call plug#begin('~/.vim/plugged')
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'mg979/vim-visual-multi', {'branch': 'master'}
-Plug 'preservim/nerdtree'
 Plug 'tpope/vim-fugitive'
-Plug 'vim-airline/vim-airline'
 Plug 'tomasr/molokai'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-surround'
+Plug 'preservim/nerdtree'
+Plug 'vim-airline/vim-airline'
 Plug 'ryanoasis/vim-devicons'
+Plug 'nathanaelkane/vim-indent-guides'
 call plug#end()
 
 "Plug 'dense-analysis/ale'
 "Plug 'airblade/vim-gitgutter'
 "}}}
 
+"{{{
+
+"}}}
 "{{{ Language Support settings
 "
 function! CocAutoInstall() abort
@@ -116,7 +119,8 @@ function! CocAutoInstall() abort
         \ 'coc-html',
         \ 'coc-css',
         \ 'coc-yaml',
-        \ 'coc-markdownlint'
+        \ 'coc-markdownlint',
+        \ 'coc-sumneko-lua',
         \ ]
    for ext in extensions
     if index(coc#util#installed_extensions(), ext) < 0
@@ -164,18 +168,14 @@ nmap <silent> gD <Plug>(coc-declaration)
 " autocmd BufWritePost * if fugitive#is_git() | call fugitive#DidChange() | endif
 " Color settings {{{
 
+"needed for icons using vim-DevIcons
+set encoding=utf-8
+set fileencoding=utf-8
+"set guifont=hack_nerd_font:h21
 " set colorscheme
 set termguicolors
 set ttyfast
 colorscheme molokai
-" Soften cursorline highlight
-highlight CursorLine ctermbg=236 guibg=#2a2a2a
-" Soften search highlight
-highlight Search ctermbg=yellow ctermfg=yellow guibg=#444444 guifg=green
-" Dim matching parens
-highlight MatchParen ctermbg=NONE guibg=#3a3a3a guifg=#ffaf5f
-set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
-"set guicursor=n-v-c-i:block
 " }}}
 
 " Maps {{{
@@ -224,27 +224,26 @@ noremap <c-right> <c-w><
 " Map the F3 key to toggle NERDTree open and close.
 nnoremap <F3> :NERDTreeToggle<cr>
 
+" Start NERDTree when Vim is started without file arguments.
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists('s:std_in') | NERDTree | endif
+
+" Close the tab if NERDTree is the only window remaining in it.
+autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | call feedkeys(":quit\<CR>:\<BS>") | endif
+
+" Open the existing NERDTree on each new tab.
+autocmd BufWinEnter * if &buftype != 'quickfix' && getcmdwintype() == '' | silent NERDTreeMirror | endif
+
+
+"let g:NERDTreeFileLines = 1
+
 " Have nerdtree ignore certain files and directories.
 let NERDTreeIgnore=['\.git$', '\.jpg$', '\.mp4$', '\.ogg$', '\.iso$', '\.pdf$', '\.pyc$', '\.odt$', '\.png$', '\.gif$', '\.db$']
+
+"Attach NERDTree to the right side instead of left
 let g:NERDTreeWinPos = "right"
-"needed for icons using vim-DevIcons
-set encoding=UTF-8
+
 "}}}
-
-" Auto-resize NERDTree to fit longest filename (with a minimum width)
-function! NERDTreeAutoSize()
-  if &filetype ==# 'nerdtree'
-    " Recalculate width based on longest line in the buffer
-    let l:maxlen = max(map(getline(1, '$'), 'strwidth(v:val)'))
-    " Add some padding, clamp to a minimum of 20 and max of 50
-    let l:width = min([max([20, l:maxlen + 2]), 50])
-    execute 'vertical resize ' . l:width
-  endif
-endfunction
-
-" Run auto-size after opening or refreshing NERDTree
-autocmd BufWinEnter,WinEnter * call NERDTreeAutoSize()
-autocmd CursorHold * if &filetype ==# 'nerdtree' | call NERDTreeAutoSize() | endif
 
 "oVIMSCRIPT -------------------------------------------------------------- {{{
 
