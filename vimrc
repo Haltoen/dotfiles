@@ -79,10 +79,15 @@ set wildmode=list:longest
 
 "colorshceme settings
 "}}}
+    set nocompatible
+    filetype plugin on
+    syntax on
+
 
 "PLUGINS ----------------------------------------------------------------{{{
 
 call plug#begin('~/.vim/plugged')
+
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tpope/vim-fugitive'
 Plug 'kh3phr3n/python-syntax'
@@ -94,10 +99,9 @@ Plug 'preservim/nerdtree'
 Plug 'vim-airline/vim-airline'
 Plug 'ryanoasis/vim-devicons'
 Plug 'yggdroot/indentline'
-call plug#end()
+Plug 'vimwiki/vimwiki'
 
-"Plug 'dense-analysis/ale'
-"Plug 'airblade/vim-gitgutter'
+call plug#end()
 "}}}
 
 "{{{ Language Support settings
@@ -131,8 +135,7 @@ endfunction
 autocmd User CocNvimInit call CocAutoInstall()
 
 " run to get Coc Extensions
-":CocInstall coc-vimlsp coc-json coc-tsserver coc-pyright coc-go coc-rust-analyzer coc-java coc-clangd coc-sh coc-html coc-css coc-yaml coc-markdownlint
-"Lint on save
+":CocInstall coc-autopep8 coc-vimlsp coc-json coc-tsserver coc-pyright coc-go coc-rust-analyzer coc-java coc-clangd coc-sh coc-html coc-css coc-yaml coc-markdownlint coc-sumneko-lua
 
 " LSP completion settings
 " Use tab for completion and navigation
@@ -256,8 +259,6 @@ nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 "}}}
 
-" Prevent Fugitive from failing on non-git files
-" autocmd BufWritePost * if fugitive#is_git() | call fugitive#DidChange() | endif
 " Color settings {{{
 
 "needed for icons using vim-DevIcons
@@ -271,11 +272,12 @@ colorscheme molokai
 " }}}
 
 " Maps {{{
-" Type jj to exit insert mode quickly.
-inoremap jj <Esc>
 
 " set space bar to <leader> (for custom commands)
-nnoremap <space> <leader>
+let mapleader = " "
+
+" Type jj to exit insert mode quickly.
+inoremap jj <Esc>
 
 " Pressing the letter o will open a new line below the current one.
 " Exit insert mode after creating a new line above or below the current line.
@@ -295,7 +297,9 @@ nnoremap Y y$
 " <CR> (carriage return) is like pressing the enter key.
 " !clear runs the external clear screen command.
 " !python3 % executes the current file with Python.
-nnoremap <f5> :w <CR>:!clear <CR>:!python3 % <CR>
+" run to get Coc Extensions
+" " run to get Coc Extensions
+" nnoremap <f5> :w <CR>:!clear <CR>:!python3 % <CR>
 " python syntax highlight
 let python_highlight_all = 1
 
@@ -315,7 +319,7 @@ noremap <c-right> <c-w><
 "}}}
 
 " {{{ NERDTree specific mappings.
-" Map the F3 key to toggle NERDTree open and close.
+    " Map the F3 key to toggle NERDTree open and close.
 nnoremap <F3> :NERDTreeToggle<cr>
 
 " Start NERDTree when Vim is started without file arguments.
@@ -363,7 +367,7 @@ endif
 " STATUS LINE ------------------------------------------------------------ {{{
 
 " Clear status line when vimrc is reloaded.
-set statusline=
+set statusline=%!''
 
 " Left side: CoC + file info + Git branch
 set statusline+=%{coc#status()}
