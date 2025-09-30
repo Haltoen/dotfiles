@@ -79,10 +79,6 @@ set wildmode=list:longest
 
 "colorshceme settings
 "}}}
-    set nocompatible
-    filetype plugin on
-    syntax on
-
 
 "PLUGINS ----------------------------------------------------------------{{{
 
@@ -152,7 +148,7 @@ inoremap <silent><expr> <CR> pumvisible() ? coc#_select_confirm() : "\<CR>"
 nmap <silent><nowait> gd <Plug>(coc-definition)
 nmap <silent><nowait> gy <Plug>(coc-type-definition)
 nmap <silent><nowait> gi <Plug>(coc-implementation)
-nmap <silent><nowait> gr <Plug>(coc-references)
+" nmap <silent><nowait> gr <Plug>(coc-references)
 
 " Use K to show documentation in preview window
 nnoremap <silent> K :call ShowDocumentation()<CR>
@@ -276,8 +272,9 @@ colorscheme molokai
 " set space bar to <leader> (for custom commands)
 let mapleader = " "
 
-" Type jj to exit insert mode quickly.
-inoremap jj <Esc>
+set nu rnu
+" windows maps 
+noremap <C-9> <C-]>
 
 " Pressing the letter o will open a new line below the current one.
 " Exit insert mode after creating a new line above or below the current line.
@@ -317,23 +314,11 @@ noremap <c-down> <c-w>-
 noremap <c-left> <c-w>>
 noremap <c-right> <c-w><
 "}}}
+" :map <F2> GoDate: <Esc>:read !date /T<CR>kJ
 
 " {{{ NERDTree specific mappings.
     " Map the F3 key to toggle NERDTree open and close.
 nnoremap <F3> :NERDTreeToggle<cr>
-
-" Start NERDTree when Vim is started without file arguments.
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists('s:std_in') | NERDTree | endif
-
-" Close the tab if NERDTree is the only window remaining in it.
-autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | call feedkeys(":quit\<CR>:\<BS>") | endif
-
-" Open the existing NERDTree on each new tab.
-" autocmd BufWinEnter * if &buftype != 'quickfix' && getcmdwintype() == '' | silent NERDTreeMirror | endif
-
-
-"let g:NERDTreeFileLines = 1
 
 " Have nerdtree ignore certain files and directories.
 let NERDTreeIgnore=['\.git$', '\.jpg$', '\.mp4$', '\.ogg$', '\.iso$', '\.pdf$', '\.pyc$', '\.odt$', '\.png$', '\.gif$', '\.db$']
@@ -365,15 +350,14 @@ endif
 " }}}
 
 " STATUS LINE ------------------------------------------------------------ {{{
+" clear first
+set statusline=
 
-" Clear status line when vimrc is reloaded.
-set statusline=%!''
-
-" Left side: CoC + file info + Git branch
-set statusline+=%{coc#status()}
+" Left side: CoC status + current function + file info + Git branch
+set statusline+=%{exists('*coc#status')?coc#status():''}
 set statusline+=%{get(b:,'coc_current_function','')}
 set statusline+=\ %F\ %M\ %Y\ %R
-set statusline+=%{fugitive#statusline()} 
+set statusline+=%{exists('*fugitive#statusline')?fugitive#statusline():''}
 
 " Divider
 set statusline+=%=
