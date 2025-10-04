@@ -80,6 +80,9 @@ set wildmode=list:longest
 "colorshceme settings
 "}}}
 
+
+command! Repos cd C:\Users\hjalt\Repos\
+command! Home cd C:\Users\hjalt\
 "PLUGINS ----------------------------------------------------------------{{{
 
 call plug#begin('~/.vim/plugged')
@@ -92,11 +95,9 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-surround'
 Plug 'preservim/nerdtree'
-Plug 'vim-airline/vim-airline'
-Plug 'ryanoasis/vim-devicons'
+Plug 'vim-airline/vim-airline'Plug 'ryanoasis/vim-devicons'
 Plug 'yggdroot/indentline'
 Plug 'vimwiki/vimwiki'
-
 call plug#end()
 "}}}
 
@@ -273,8 +274,7 @@ colorscheme molokai
 let mapleader = " "
 
 set nu rnu
-" windows maps 
-noremap <C-9> <C-]>
+" windows mapsnoremap <C-9> <C-]>
 
 " Pressing the letter o will open a new line below the current one.
 " Exit insert mode after creating a new line above or below the current line.
@@ -315,13 +315,46 @@ noremap <c-left> <c-w>>
 noremap <c-right> <c-w><
 "}}}
 " :map <F2> GoDate: <Esc>:read !date /T<CR>kJ
+noremap <F2> :keeppatterns %s/\s\+$//e<CR>
+" my autocommands {{{
+augroup TrimWhiteSpace
+  autocmd!
+  autocmd BufWritePre * call TrimWhitespace()
+augroup END
+
+function! TrimWhitespace()
+  let l:view = winsaveview()
+  silent! keeppatterns %s/\s\+$//e
+  call winrestview(l:view)
+endfunction
+" }}}
 
 " {{{ NERDTree specific mappings.
-    " Map the F3 key to toggle NERDTree open and close.
-nnoremap <F3> :NERDTreeToggle<cr>
+
+function! ToggleOrFocusNERDTree()
+  if exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1
+    " NERDTree is open
+    if bufwinnr(t:NERDTreeBufName) == winnr()
+      " Already in NERDTree -> close it
+      NERDTreeClose
+    else
+      " Not in NERDTree -> focus it
+      NERDTreeFocus
+    endif
+  else
+    " NERDTree not open -> open it
+    NERDTree
+  endif
+endfunction
+
+" map f3 to toggle NERDTree, and focus if in another window.
+nnoremap <F3> :call ToggleOrFocusNERDTree()<CR>
+
+" Whenever entering the NERDTree buffer, refresh it
+autocmd BufEnter * if bufname("%") =~ 'NERD_tree_' | execute 'NERDTreeRefreshRoot' | endif
 
 " Have nerdtree ignore certain files and directories.
-let NERDTreeIgnore=['\.git$', '\.jpg$', '\.mp4$', '\.ogg$', '\.iso$', '\.pdf$', '\.pyc$', '\.odt$', '\.png$', '\.gif$', '\.db$']
+let NERDTreeIgnore=['\.git$', '\.jpg$', '\.mp4$', '\.ogg$', '\.iso$', '\.pdf$', '\.pyc$', '\.odt$', '\.png$', '\.gif$', '\.db$', '__pycache__' ]
 
 "Attach NERDTree to the right side instead of left
 let g:NERDTreeWinPos = "right"
