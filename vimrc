@@ -79,10 +79,12 @@ set wildmode=list:longest
 
 "colorshceme settings
 "}}}
-
+" disable flicker on mistakes in git bash
+set t_vb=
 
 command! Repos cd C:\Users\hjalt\Repos\
 command! Home cd C:\Users\hjalt\
+
 "PLUGINS ----------------------------------------------------------------{{{
 
 call plug#begin('~/.vim/plugged')
@@ -99,6 +101,114 @@ Plug 'vim-airline/vim-airline'Plug 'ryanoasis/vim-devicons'
 Plug 'yggdroot/indentline'
 Plug 'vimwiki/vimwiki'
 call plug#end()
+"}}}
+
+" Color settings {{{
+
+"needed for icons using vim-DevIcons
+set encoding=utf-8
+set fileencoding=utf-8
+"set guifont=hack_nerd_font:h21
+" set colorscheme
+set termguicolors
+set ttyfast
+colorscheme molokai
+" }}}
+
+" Maps {{{
+
+" set space bar to <leader> (for custom commands)
+let mapleader = " "
+
+" fast fuzzy find
+nnoremap <silent> <leader>f :<C-u>Files<CR>
+
+" fugitive shortcut{{{
+noremap <leader>g :G<CR>"}}}
+
+" remove trailing white-spaces
+noremap <F2> :keeppatterns %s/\s\+$//e<CR>
+
+set nu rnu
+" windows mapsnoremap <C-9> <C-]>
+
+" Center the cursor vertically when moving to the next word during a search.
+nnoremap n nzz
+nnoremap N Nzz
+
+" Yank from cursor to the end of line.
+nnoremap Y y$
+
+" Map the F5 key to run a Python script inside Vim.
+" We map F5 to a chain of commands here.
+" :w saves the file.
+" <CR> (carriage return) is like pressing the enter key.
+" !clear runs the external clear screen command.
+" !python3 % executes the current file with Python.
+" run to get Coc Extensions
+" " run to get Coc Extensions
+" nnoremap <f5> :w <CR>:!clear <CR>:!python3 % <CR>
+" python syntax highlight
+let python_highlight_all = 1
+
+" You can split the window in Vim by typing :split or :vsplit.
+" Navigate the split view easier by pressing CTRL+j, CTRL+k, CTRL+h, or CTRL+l.
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
+nnoremap <c-h> <c-w>h
+nnoremap <c-l> <c-w>l
+
+" Resize split windows using arrow keys by pressing:
+" CTRL+UP, CTRL+DOWN, CTRL+LEFT, or CTRL+RIGHT.
+noremap <c-up> <c-w>+
+noremap <c-down> <c-w>-
+noremap <c-left> <c-w>>
+noremap <c-right> <c-w><
+"}}}
+
+" my autocommands {{{
+augroup TrimWhiteSpace
+  autocmd!
+  autocmd BufWritePre * call TrimWhitespace()
+augroup END
+
+function! TrimWhitespace()
+  let l:view = winsaveview()
+  silent! keeppatterns %s/\s\+$//e
+  call winrestview(l:view)
+endfunction
+" }}}
+
+" {{{ NERDTree specific mappings.
+
+function! ToggleOrFocusNERDTree()
+  if exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1
+    " NERDTree is open
+    if bufwinnr(t:NERDTreeBufName) == winnr()
+      " Already in NERDTree -> close it
+      NERDTreeClose
+    else
+      " Not in NERDTree -> focus it
+      NERDTreeFocus
+    endif
+  else
+    " NERDTree not open -> open it
+    NERDTree
+  endif
+endfunction
+
+" map f3 to toggle NERDTree, and focus if in another window.
+nnoremap <F3> :call ToggleOrFocusNERDTree()<CR>
+
+" Whenever entering the NERDTree buffer, refresh it
+autocmd BufEnter * if bufname("%") =~ 'NERD_tree_' | execute 'NERDTreeRefreshRoot' | endif
+
+" Have nerdtree ignore certain files and directories.
+let NERDTreeIgnore=['\.git$', '\.jpg$', '\.mp4$', '\.ogg$', '\.iso$', '\.pdf$', '\.pyc$', '\.odt$', '\.png$', '\.gif$', '\.db$', '__pycache__' ]
+
+"Attach NERDTree to the right side instead of left
+let g:NERDTreeWinPos = "right"
+
 "}}}
 
 "{{{ Language Support settings
@@ -169,8 +279,8 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 nmap <leader>rn <Plug>(coc-rename)
 
 " Formatting selected code
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+xmap <leader>F  <Plug>(coc-format-selected)
+nmap <leader>F  <Plug>(coc-format-selected)
 
 augroup mygroup
   autocmd!
@@ -254,111 +364,6 @@ nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
-"}}}
-
-" Color settings {{{
-
-"needed for icons using vim-DevIcons
-set encoding=utf-8
-set fileencoding=utf-8
-"set guifont=hack_nerd_font:h21
-" set colorscheme
-set termguicolors
-set ttyfast
-colorscheme molokai
-" }}}
-
-" Maps {{{
-
-" set space bar to <leader> (for custom commands)
-let mapleader = " "
-
-set nu rnu
-" windows mapsnoremap <C-9> <C-]>
-
-" Pressing the letter o will open a new line below the current one.
-" Exit insert mode after creating a new line above or below the current line.
-"nnoremap o o<esc>
-"nnoremap O O<esc>
-
-" Center the cursor vertically when moving to the next word during a search.
-nnoremap n nzz
-nnoremap N Nzz
-
-" Yank from cursor to the end of line.
-nnoremap Y y$
-
-" Map the F5 key to run a Python script inside Vim.
-" We map F5 to a chain of commands here.
-" :w saves the file.
-" <CR> (carriage return) is like pressing the enter key.
-" !clear runs the external clear screen command.
-" !python3 % executes the current file with Python.
-" run to get Coc Extensions
-" " run to get Coc Extensions
-" nnoremap <f5> :w <CR>:!clear <CR>:!python3 % <CR>
-" python syntax highlight
-let python_highlight_all = 1
-
-" You can split the window in Vim by typing :split or :vsplit.
-" Navigate the split view easier by pressing CTRL+j, CTRL+k, CTRL+h, or CTRL+l.
-nnoremap <c-j> <c-w>j
-nnoremap <c-k> <c-w>k
-nnoremap <c-h> <c-w>h
-nnoremap <c-l> <c-w>l
-
-" Resize split windows using arrow keys by pressing:
-" CTRL+UP, CTRL+DOWN, CTRL+LEFT, or CTRL+RIGHT.
-noremap <c-up> <c-w>+
-noremap <c-down> <c-w>-
-noremap <c-left> <c-w>>
-noremap <c-right> <c-w><
-"}}}
-" :map <F2> GoDate: <Esc>:read !date /T<CR>kJ
-noremap <F2> :keeppatterns %s/\s\+$//e<CR>
-" my autocommands {{{
-augroup TrimWhiteSpace
-  autocmd!
-  autocmd BufWritePre * call TrimWhitespace()
-augroup END
-
-function! TrimWhitespace()
-  let l:view = winsaveview()
-  silent! keeppatterns %s/\s\+$//e
-  call winrestview(l:view)
-endfunction
-" }}}
-
-" {{{ NERDTree specific mappings.
-
-function! ToggleOrFocusNERDTree()
-  if exists("t:NERDTreeBufName") && bufwinnr(t:NERDTreeBufName) != -1
-    " NERDTree is open
-    if bufwinnr(t:NERDTreeBufName) == winnr()
-      " Already in NERDTree -> close it
-      NERDTreeClose
-    else
-      " Not in NERDTree -> focus it
-      NERDTreeFocus
-    endif
-  else
-    " NERDTree not open -> open it
-    NERDTree
-  endif
-endfunction
-
-" map f3 to toggle NERDTree, and focus if in another window.
-nnoremap <F3> :call ToggleOrFocusNERDTree()<CR>
-
-" Whenever entering the NERDTree buffer, refresh it
-autocmd BufEnter * if bufname("%") =~ 'NERD_tree_' | execute 'NERDTreeRefreshRoot' | endif
-
-" Have nerdtree ignore certain files and directories.
-let NERDTreeIgnore=['\.git$', '\.jpg$', '\.mp4$', '\.ogg$', '\.iso$', '\.pdf$', '\.pyc$', '\.odt$', '\.png$', '\.gif$', '\.db$', '__pycache__' ]
-
-"Attach NERDTree to the right side instead of left
-let g:NERDTreeWinPos = "right"
-
 "}}}
 
 "oVIMSCRIPT -------------------------------------------------------------- {{{
