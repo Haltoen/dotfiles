@@ -23,7 +23,9 @@ filetype plugin on
 filetype indent on
 
 " Turn syntax highlighting on.
-syntax on
+syntax enable
+filetype plugin indent on
+let python_highlight_all = 1
 
 " Add numbers to the file.
 set number
@@ -82,8 +84,39 @@ set wildmode=list:longest
 " disable flicker on mistakes in git bash
 set t_vb=
 
-command! Repos cd C:\Users\hjalt\Repos\
-command! Home cd C:\Users\hjalt\
+if has("win32") || has("win64")
+  " Windows CMD / native Vim
+  command! Repos cd C:/Users/hjalt/Repos
+  command! Home  cd C:/Users/hjalt
+  command! DotF  cd C:/Users/hjalt/dotfiles
+  " Needed to fix fzf popup/window
+  let g:fzf_layout = { 'down': '~40%' }
+else
+  " Git Bash / Unix-like Vim
+  command! Repos cd /mnt/c/Users/hjalt/Repos
+  command! Home  cd /mnt/c/Users/hjalt
+  command! DotF  cd /mnt/c/Users/hjalt/dotfiles
+endif
+
+" --- Copy to Windows clipboard when yanking to register + ---
+if system('uname -r') =~ "microsoft"
+  function! WSLYank(type, reg)
+    " Use full path to clip.exe if needed
+    let l:clip = '/mnt/c/Windows/System32/clip.exe'
+    if executable('clip.exe')
+      let l:clip = 'clip.exe'
+    endif
+    if a:reg ==# '+'
+      call system(l:clip, @+)
+      echo "Copied to Windows clipboard (+)"
+    endif
+  endfunction
+
+  augroup WSLClipboard
+    autocmd!
+    autocmd TextYankPost * call WSLYank(v:event.operator, v:event.regname)
+  augroup END
+endif
 
 "PLUGINS ----------------------------------------------------------------{{{
 
@@ -91,26 +124,31 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tpope/vim-fugitive'
-Plug 'kh3phr3n/python-syntax'
+" Plug 'kh3phr3n/python-syntax'
+Plug 'sheerun/vim-polyglot'
 Plug 'tomasr/molokai'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-surround'
 Plug 'preservim/nerdtree'
-Plug 'vim-airline/vim-airline'Plug 'ryanoasis/vim-devicons'
+Plug 'vim-airline/vim-airline'
+Plug 'ryanoasis/vim-devicons'
 Plug 'yggdroot/indentline'
 Plug 'vimwiki/vimwiki'
 call plug#end()
 "}}}
 
 " Color settings {{{
-
 "needed for icons using vim-DevIcons
 set encoding=utf-8
+set termencoding=utf-8
 set fileencoding=utf-8
-"set guifont=hack_nerd_font:h21
+if has('termguicolors')
+  set termguicolors
+else
+  set t_Co=256
+endif
 " set colorscheme
-set termguicolors
 set ttyfast
 colorscheme molokai
 " }}}
@@ -120,9 +158,9 @@ colorscheme molokai
 " set space bar to <leader> (for custom commands)
 let mapleader = " "
 
-" fast fuzzy find
+" fast fuzzy-find Files and Buffers
 nnoremap <silent> <leader>f :<C-u>Files<CR>
-
+nnoremap <silent> <leader>b :<C-u>Buffers<CR>
 " fugitive shortcut{{{
 noremap <leader>g :G<CR>"}}}
 
@@ -149,7 +187,6 @@ nnoremap Y y$
 " " run to get Coc Extensions
 " nnoremap <f5> :w <CR>:!clear <CR>:!python3 % <CR>
 " python syntax highlight
-let python_highlight_all = 1
 
 " You can split the window in Vim by typing :split or :vsplit.
 " Navigate the split view easier by pressing CTRL+j, CTRL+k, CTRL+h, or CTRL+l.
@@ -349,21 +386,21 @@ command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.org
 
 " Mappings for CoCList
 " Show all diagnostics
-nnoremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
+nnoremap <silent><nowait> <leader>a  :<C-u>CocList diagnostics<cr>
 " Manage extensions
-nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
+nnoremap <silent><nowait> <leader>e  :<C-u>CocList extensions<cr>
 " Show commands
-nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
+nnoremap <silent><nowait> <leader>c  :<C-u>CocList commands<cr>
 " Find symbol of current document
-nnoremap <silent><nowait> <space>o  :<C-u>CocList outline<cr>
+nnoremap <silent><nowait> <leader>o  :<C-u>CocList outline<cr>
 " Search workspace symbols
-nnoremap <silent><nowait> <space>s  :<C-u>CocList -I symbols<cr>
+nnoremap <silent><nowait> <leader>s  :<C-u>CocList -I symbols<cr>
 " Do default action for next item
-nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
+nnoremap <silent><nowait> <leader>j  :<C-u>CocNext<CR>
 " Do default action for previous item
-nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
+nnoremap <silent><nowait> <leader>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
-nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
+nnoremap <silent><nowait> <leader>p  :<C-u>CocListResume<CR>
 "}}}
 
 "oVIMSCRIPT -------------------------------------------------------------- {{{
