@@ -27,9 +27,9 @@ syntax enable
 filetype plugin indent on
 let python_highlight_all = 1
 
-" Add numbers to the file.
+" Add relative line numbers to the file.
 set number
-
+set relativenumber
 " Highlight cursor line underneath the cursor horizontally.
 set cursorline
 
@@ -91,6 +91,7 @@ if has("win32") || has("win64")
   command! DotF  cd C:/Users/hjalt/dotfiles
   " Needed to fix fzf popup/window
   let g:fzf_layout = { 'down': '~40%' }
+  autocmd FileType sh let b:coc_enabled = 0
 else
   " Git Bash / Unix-like Vim
   command! Repos cd /mnt/c/Users/hjalt/Repos
@@ -120,10 +121,14 @@ endif
 
 "PLUGINS ----------------------------------------------------------------{{{
 
+" TODO add commentary plugin back and learn it,
+" + decide if surroun, airline are needed
 call plug#begin('~/.vim/plugged')
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tpope/vim-fugitive'
+Plug 'rbong/vim-flog'
+Plug 'https://github.com/wolandark/vim-live-server.git'
 " Plug 'kh3phr3n/python-syntax'
 Plug 'sheerun/vim-polyglot'
 Plug 'tomasr/molokai'
@@ -135,8 +140,10 @@ Plug 'vim-airline/vim-airline'
 Plug 'ryanoasis/vim-devicons'
 Plug 'yggdroot/indentline'
 Plug 'vimwiki/vimwiki'
+Plug 'airblade/vim-gitgutter'
 call plug#end()
 "}}}
+
 
 " Color settings {{{
 "needed for icons using vim-DevIcons
@@ -204,16 +211,16 @@ noremap <c-right> <c-w><
 "}}}
 
 " my autocommands {{{
-augroup TrimWhiteSpace
-  autocmd!
-  autocmd BufWritePre * call TrimWhitespace()
-augroup END
-
-function! TrimWhitespace()
-  let l:view = winsaveview()
-  silent! keeppatterns %s/\s\+$//e
-  call winrestview(l:view)
-endfunction
+"augroup TrimWhiteSpace
+"  autocmd!
+"  autocmd BufWritePre * call TrimWhitespace()
+"augroup END
+"
+"function! TrimWhitespace()
+"  let l:view = winsaveview()
+"  silent! keeppatterns %s/\s\+$//e
+"  call winrestview(l:view)
+"endfunction
 " }}}
 
 " {{{ NERDTree specific mappings.
